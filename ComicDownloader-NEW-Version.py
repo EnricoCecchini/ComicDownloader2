@@ -108,9 +108,13 @@ def run():
     # Calls function to start browser
     browser = start(url)
     
+    # Minimize browser after starting it
+    browser.minimize_window()
+    
     # Calls function to download images
     downloadImages(browser, imageTag, name, nextButtonXPath, comicLength)
 
+    # Quit browser after comic is downloaded
     browser.quit()
 
 # Loop to download multiple comics until user decides to stop
