@@ -15,6 +15,10 @@ def start(url):
     chrome_options.add_argument("--incognito")
     browser = webdriver.Chrome(chrome_options = chrome_options)
 
+    # Hide browser without minimizing
+    # Note: browser.minimize_window() will cause program to stop going to next page
+    browser.set_window_position(-2000, 0)
+
     browser.get(url)
 
     return browser
@@ -43,8 +47,7 @@ def comicSourceSite():
 
     # Dictionary with comic Source for XPath and imageTag
     comicSources = {
-        "ReadComicsOnline -> ": 1
-        # Add new options to the menu so more sites can be scraped
+        "ReadComicsOnline.ru  -> ": 1
     }
     # To add other sites, simply add new Option in Dictionary 
     # and in IF Elif add new with nextButtonXPath and Image Tag for site
@@ -61,9 +64,8 @@ def comicSourceSite():
     if source == 1:
         nextButtonXPath = '/html/body/div[3]/div[1]/div/div/div[3]/ul[2]/li/a'
         imageTag = 'img.img-responsive.scan-page'
-    # Add new if, elif statements where the XPath for the next button and the image tag are set.
     else:
-        print('Invalid source. Exiting program')
+        print('Invalid source. Closing program')
         exit()
     
     return nextButtonXPath, imageTag
@@ -76,6 +78,8 @@ def downloadImages(browser, imageTag, name, nextButtonXPath,comicLength):
     for i in range(comicLength):
         j = i+1
 
+        print(f'Page {j} of {comicLength}')
+
         # Obtain image source URL to download by finding elements that match image tag
         imageURL = browser.find_element_by_tag_name(imageTag).get_attribute('src')
 
@@ -85,7 +89,7 @@ def downloadImages(browser, imageTag, name, nextButtonXPath,comicLength):
         # Saves image to desired folder
         with open(f'{name}/{name} pg{j}.png', 'wb') as f:
                     f.write(r.content)
-
+        
         # Finds Next button on comic to go to next page
         nextButton = browser.find_element_by_xpath(nextButtonXPath)
 
@@ -107,15 +111,15 @@ def run():
     
     # Calls function to start browser
     browser = start(url)
-    
-    # Minimize browser after starting it
-    browser.minimize_window()
-    
+
     # Calls function to download images
     downloadImages(browser, imageTag, name, nextButtonXPath, comicLength)
 
     # Quit browser after comic is downloaded
     browser.quit()
+
+    # Print finish message
+    print(f'\n\n{name} Done!')
 
 # Loop to download multiple comics until user decides to stop
 next = True
