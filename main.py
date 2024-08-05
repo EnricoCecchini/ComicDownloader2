@@ -11,16 +11,12 @@ import sys
 
 # Start function to open browser in Incognito Mode
 def start(url):
-    # Open Chrome Browser in INcognito Mode
+    # Open Chrome Browser in Incognito Mode
     chrome_options = Options()
     chrome_options.add_argument("--incognito")
     chrome_options.add_argument("--start-minimized")
+
     browser = webdriver.Chrome(options = chrome_options)
-
-    # Hide browser without minimizing
-    # Note: browser.minimize_window() will cause program to stop going to next page
-    # browser.set_window_position(-10000, 0)
-
     browser.get(url)
 
     return browser
@@ -42,18 +38,13 @@ def recieveInput():
     # Clear Terminal when downloading a new comic
     os.system('cls')
 
-    # print(f'Comic URL: {url}')
+    return url
 
-    # # input comic name
-    # name = input('Comic Name: ').replace(':', ' -')
-    # Length of comic for Loop
-    #comicLength = int(input('Amount of pages: '))
-
-    return url #, name
 
 def get_title(browser, title_path):
     title = browser.find_element(By.XPATH, title_path).text
     return title
+
 
 # Function to create new folder to store comic
 def makeFolder(name):
@@ -62,31 +53,28 @@ def makeFolder(name):
     except FileExistsError:
         print(f'{name} already exists')
 
+
 # Method to check which website the comic coes from
 def comicSourceSite(url):
-    #print(' ')
 
     # Dictionary with comic Source for XPath and image_class
     comicSources = {
         "ReadComicsOnline.ru  -> ": 1,
     }
     # To add other sites, simply add new Option in Dictionary
-    # and in IF Elif add new with nextButtonXPath and Image Tag for site
+    # and in IF Elif add new with nextButtonXPath and Image Class and Xpath for title of the issue for site
 
     # Comic Source
     if 'readcomicsonline' in url:
         source = 1
+        # Chooses nextButtonXPath, title XPATH and img class name depending on comic source
+        nextButtonXPath = '/html/body/div[3]/div[1]/div/div/div[3]/ul[2]/li/a'
+        image_class = 'scan-page'
+        title_path = '/html/body/div[3]/div[1]/div/div/div[1]/a'
 
-    # Chooses nextButtonXPath, title XPATH and img class name depending on comic source
-    match (source):
-        case 1:
-            nextButtonXPath = '/html/body/div[3]/div[1]/div/div/div[3]/ul[2]/li/a'
-            image_class = 'scan-page'
-            title_path = '/html/body/div[3]/div[1]/div/div/div[1]/a'
-
-        case _:
-            print('Invalid source. Closing program')
-            exit()
+    else:
+        print('Invalid source. Closing program')
+        exit()
 
     return nextButtonXPath, image_class, title_path
 
